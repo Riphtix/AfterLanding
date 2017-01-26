@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class Player : MonoBehaviour {
 	private static Player instance;
@@ -10,6 +11,7 @@ public class Player : MonoBehaviour {
 	private static int currentLevel;
 	private static int currentHealth;
 	private static int currentXP;
+	private static int upgradePoints;
 
 	public Sprite sprite;
 	
@@ -30,6 +32,7 @@ public class Player : MonoBehaviour {
 		get {
 			if(maxHealth == 0) {
 				maxHealth = 100;
+				CurrentHealth = maxHealth;
 			}
 			return maxHealth;
 		}
@@ -82,6 +85,16 @@ public class Player : MonoBehaviour {
 		}
 	}
 
+	public static int UpgradePoints {
+		get {
+			return upgradePoints;
+		}
+
+		set {
+			upgradePoints = value;
+		}
+	}
+
 	// Use this for initialization
 	void Start () {
 		
@@ -89,6 +102,8 @@ public class Player : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-		
+		GameObject.Find("HP").GetComponent<Text>().text = "HP: " + CurrentHealth + "/" + MaxHealth;
+		GameObject.Find("XP").GetComponent<Text>().text = "XP: " + CurrentXP + "/" + XpToNextLevel;
+		GameObject.Find("Level").GetComponent<Text>().text = "LVL: " + CurrentLevel;
 	}
 }
