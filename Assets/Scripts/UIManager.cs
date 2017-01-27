@@ -3,26 +3,26 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class UIManager : MonoBehaviour {
+	private static UIManager instance;
 
-	private static GameObject pauseMenu;
+	public GameObject pauseMenu;
 
-	public static GameObject PauseMenu {
+	public static UIManager Instance {
 		get {
-			if(pauseMenu == null) {
-				pauseMenu = GameObject.Find("Pause Menu");
-				pauseMenu.SetActive(false);
+			if(instance == null) {
+				instance = GameObject.Find("UIManager").GetComponent<UIManager>();
 			}
-			return pauseMenu;
+			return instance;
 		}
 
 		set {
-			pauseMenu = value;
+			instance = value;
 		}
 	}
 
 	// Use this for initialization
 	void Start () {
-		PauseMenu.SetActive(false);
+
 	}
 	
 	// Update is called once per frame
@@ -31,6 +31,6 @@ public class UIManager : MonoBehaviour {
 	}
 
 	public void togglePauseMenu(bool toggle) {
-		PauseMenu.SetActive(toggle);
+		pauseMenu.SetActive(toggle);
 	}
 }
