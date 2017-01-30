@@ -15,7 +15,6 @@ public class Player : MonoBehaviour {
 
 	public Sprite sprite;
 	public float moveSpeed = .1f;
-	public float rotationSpeed = 5f;
 	public Vector3 moveVector { set; get; }
 	public Vector3 rotVector { set; get; }
 	public VirtualJoystick moveJoystick;
@@ -103,6 +102,8 @@ public class Player : MonoBehaviour {
 		if (CurrentLevel < 1) {
 			ExperienceManager.Instance.levelUp();
 		}
+
+		GetComponent<SpriteRenderer>().sprite = sprite;
 	}
 	
 	// Update is called once per frame
@@ -120,6 +121,8 @@ public class Player : MonoBehaviour {
 		GameObject.Find("HP").GetComponent<Text>().text = "HP: " + CurrentHealth + "/" + MaxHealth;
 		GameObject.Find("XP").GetComponent<Text>().text = "XP: " + CurrentXP + "/" + XpToNextLevel;
 		GameObject.Find("Level").GetComponent<Text>().text = "LVL: " + CurrentLevel;
+
+		Camera.main.transform.position = new Vector3(gameObject.transform.position.x, gameObject.transform.position.y, -10);
 	}
 
 	private void move() {
@@ -127,7 +130,7 @@ public class Player : MonoBehaviour {
 	}
 
 	private void turn() {
-		transform.rotation = new Quaternion(rotVector.x, rotVector.y, 0, 0);
+		transform.rotation = Quaternion.Euler(rotVector);
 	}
 
 	private Vector3 poolInput() {
@@ -146,9 +149,10 @@ public class Player : MonoBehaviour {
 	private Vector3 rotInput() {
 		Vector3 dir = Vector3.zero;
 		
-		dir.x = rotJoystick.horizontal();
-		dir.y = rotJoystick.vertical();
-		dir.z = 0;
+		dir.x = 0;
+		dir.y = 0;
+		dir.z = -Mathf.Atan2(rotJoystick.rotHorizontal(), rotJoystick.rotVertical()) * Mathf.Rad2Deg;
+		Debug.Log(dir);
 
 		return dir;
 	}
