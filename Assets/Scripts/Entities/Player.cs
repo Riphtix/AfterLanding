@@ -14,7 +14,7 @@ public class Player : MonoBehaviour {
 	private static int upgradePoints;
 
 	public Sprite sprite;
-	public float moveSpeed = .1f;
+	public float moveSpeed = 20;
 	public Vector3 moveVector { set; get; }
 	public Vector3 rotVector { set; get; }
 	public VirtualJoystick moveJoystick;
@@ -126,7 +126,7 @@ public class Player : MonoBehaviour {
 	}
 
 	private void move() {
-		transform.position += moveVector * moveSpeed;
+		transform.position += moveVector * (moveSpeed * Time.deltaTime);
 	}
 
 	private void turn() {
@@ -152,7 +152,6 @@ public class Player : MonoBehaviour {
 		dir.x = 0;
 		dir.y = 0;
 		dir.z = -Mathf.Atan2(rotJoystick.rotHorizontal(), rotJoystick.rotVertical()) * Mathf.Rad2Deg;
-		Debug.Log(dir);
 
 		return dir;
 	}
