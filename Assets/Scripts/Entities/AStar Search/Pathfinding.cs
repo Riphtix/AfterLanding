@@ -6,26 +6,21 @@ using System;
 
 public class Pathfinding : MonoBehaviour {
 	Grid grid;
-	PathRequestManager requestManager;
 
 	private void Awake() {
 		grid = GetComponent<Grid>();
-		requestManager = GetComponent<PathRequestManager>();
 	}
 
-	public void StartFindPath(Vector2 startPos, Vector2 targetPos) {
-		StartCoroutine(FindPath(startPos, targetPos));
-	}
-
-	IEnumerator FindPath(Vector2 startPos, Vector2 targetPos) {
+	public void FindPath(PathRequest request, Action<PathResult> callback) {
 		Stopwatch sw = new Stopwatch();
 		sw.Start();
 
 		Vector2[] waypoints = new Vector2[0];
 		bool pathSuccess = false;
 
-		Node startNode = grid.nodeFromWorldPoint(startPos);
-		Node targetNode = grid.nodeFromWorldPoint(targetPos);
+		Node startNode = grid.nodeFromWorldPoint(request.pathStart);
+		Node targetNode = grid.nodeFromWorldPoint(request.pathEnd);
+		startNode.parent = startNode;
 
 		if (startNode.walkable && targetNode.walkable) {
 			Heap<Node> openSet = new Heap<Node>(grid.MaxSize);
@@ -48,7 +43,7 @@ public class Pathfinding : MonoBehaviour {
 						continue;
 					}
 
-					int newMovementCostToNeighbor = currentNode.gCost + GetDistance(currentNode, neighbor);
+					int newMovementCostToNeighbor = currentNode.gCost + GetDistance(currentNode, neighbor) + neighbor.movementPenalty;
 					if (newMovementCostToNeighbor < neighbor.gCost || !openSet.Contains(neighbor)) {
 						neighbor.gCost = newMovementCostToNeighbor;
 						neighbor.hCost = GetDistance(neighbor, targetNode);
@@ -63,11 +58,11 @@ public class Pathfinding : MonoBehaviour {
 				}
 			}
 		}
-		yield return null;
 		if (pathSuccess) {
 			waypoints = RetracePath(startNode, targetNode);
+			pathSuccess = waypoints.Length > 0;
 		}
-		requestManager.FinishedProcessingPath(waypoints, pathSuccess);
+		callback(new PathResult(waypoints, pathSuccess, request.callback));
 	}
 
 	Vector2[] RetracePath(Node startNode, Node endNode) {

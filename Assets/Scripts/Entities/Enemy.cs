@@ -31,14 +31,14 @@ public class Enemy : MonoBehaviour {
 		if (Time.timeSinceLevelLoad < .3f) {
 			yield return new WaitForSeconds(.3f);
 		}
-		PathRequestManager.RequestPath(transform.position, target.position, OnPathFound);
+		PathRequestManager.RequestPath(new PathRequest(transform.position, target.position, OnPathFound));
 		float sqrMoveThreshold = pathUpdateMoveThreshold * pathUpdateMoveThreshold;
 		Vector2 targetPosOld = target.position;
 
 		while (true) {
 			yield return new WaitForSeconds(minPathUpdateTime);
 			if (((Vector2) target.position - targetPosOld).sqrMagnitude > sqrMoveThreshold) {
-				PathRequestManager.RequestPath(transform.position, target.position, OnPathFound);
+				PathRequestManager.RequestPath(new PathRequest(transform.position, target.position, OnPathFound));
 				targetPosOld = target.position;
 			}
 		}
@@ -62,13 +62,10 @@ public class Enemy : MonoBehaviour {
 				}
 
 				if (followingPath) {
-					Quaternion targetRotation = Quaternion.LookRotation((Vector3) path.lookPoints[pathIndex] - transform.position);
-					if (transform.rotation.z > 90 || transform.rotation.z < -90) {
-						transform.rotation = new Quaternion(0, 0, -transform.rotation.z, transform.rotation.w);
-					} else {
-						transform.rotation = new Quaternion(0, 0, transform.rotation.z, transform.rotation.w);
-					}
-					transform.rotation = Quaternion.Lerp(transform.rotation, targetRotation, Time.deltaTime * turnSpeed);
+					Vector2 vectorToTarget = new Vector2(path.lookPoints[pathIndex].x, path.lookPoints[pathIndex].y) - (Vector2)transform.position;
+					float angle = Mathf.Atan2(vectorToTarget.y, vectorToTarget.x) * Mathf.Rad2Deg;
+					Quaternion q = Quaternion.AngleAxis(angle, Vector3.forward);
+					transform.rotation = q;
 					transform.position = Vector2.MoveTowards(transform.position, path.lookPoints[pathIndex], speed * Time.deltaTime);
 				}
 
